@@ -69,6 +69,19 @@ target_link_libraries (create-test-files
   orc::protobuf
 )
 
+add_executable (RawReaderExp
+RawReaderExp.cc
+)
+
+target_link_libraries (RawReaderExp
+  orc
+  orc::lz4
+  orc::protobuf
+  orc::snappy
+  orc::zlib
+  orc::gmock
+)
+
 if (TEST_VALGRIND_MEMCHECK)
   add_test (orc-test
           valgrind --tool=memcheck --leak-check=full --error-exitcode=1 ./orc-test)
