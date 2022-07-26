@@ -14,6 +14,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/c++/src
   ${PROJECT_BINARY_DIR}/c++/include
   ${PROJECT_BINARY_DIR}/c++/src
+  ${PROJECT_SOURCE_DIR}/c++/include
 )
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_FLAGS} ${WARN_FLAGS}")
@@ -52,6 +53,21 @@ add_executable (orc-test
 )
 
 target_link_libraries (orc-test
+  orc
+  orc::lz4
+  orc::protobuf
+  orc::snappy
+  orc::zlib
+  orc::gmock
+)
+
+add_executable (rle-test
+  RleTest.cc
+  MemoryInputStream.cc
+  MemoryOutputStream.cc
+)
+
+target_link_libraries (rle-test
   orc
   orc::lz4
   orc::protobuf

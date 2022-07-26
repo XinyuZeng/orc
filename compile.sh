@@ -1,0 +1,2 @@
+cmake .. -DBUILD_JAVA=OFF -DCMAKE_BUILD_TYPE=RELEASE
+make -j8 package

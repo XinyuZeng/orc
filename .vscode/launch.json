@@ -1,0 +1,53 @@
+{
+    "configurations": [
+        {
+            "name": "rle-test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/c++/test/rle-test",
+            "args": ["/mnt_nvme/OpenFormat/python/data_gen/idx.txt"],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description":  "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+    {
+        "name": "orc-scan",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/build/tools/src/orc-scan",
+        "args": ["/mnt_nvme/OpenFormat/python/strlen20_rows20000000_cols10_zipf2.0_UNCOMPRESSED_speed_1_1048576_50331648.orc"],
+        "stopAtEntry": false,
+        "cwd": "${fileDirname}",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+            {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+            },
+            {
+                "description":  "Set Disassembly Flavor to Intel",
+                "text": "-gdb-set disassembly-flavor intel",
+                "ignoreFailures": true
+            }
+        ]
+    }
+    ],
+}
+  

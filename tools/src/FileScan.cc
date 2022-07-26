@@ -19,11 +19,14 @@
 #include "ToolsHelper.hh"
 
 #include <iostream>
+#include <chrono>
 
 void scanFile(std::ostream & out, const char* filename, uint64_t batchSize,
               const orc::RowReaderOptions& rowReaderOpts,
               bool showMetrics) {
   orc::ReaderOptions readerOpts;
+  readerOpts.setReaderMetrics(nullptr);
+  auto begin = std::chrono::high_resolution_clock::now();
   std::unique_ptr<orc::Reader> reader =
     orc::createReader(orc::readFile(filename,
                                     readerOpts.getReaderMetrics()),
@@ -38,6 +41,7 @@ void scanFile(std::ostream & out, const char* filename, uint64_t batchSize,
     batches += 1;
     rows += batch->numElements;
   }
+  out << "read pq(s): " << (static_cast<std::chrono::duration<float>>(std::chrono::high_resolution_clock::now() - begin)).count() <<std::endl;
   out << "Rows: " << rows << std::endl;
   out << "Batches: " << batches << std::endl;
   if (showMetrics) {
