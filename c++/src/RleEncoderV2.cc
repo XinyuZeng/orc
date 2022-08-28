@@ -20,6 +20,8 @@
 #include "Compression.hh"
 #include "RLEv2.hh"
 #include "RLEV2Util.hh"
+#include "Config.hh"
+#include "Stats.hh"
 
 #define MAX_SHORT_REPEAT_LENGTH 10
 
@@ -470,6 +472,9 @@ uint64_t RleEncoderV2::flush() {
 
 void RleEncoderV2::writeValues(EncodingOption& option) {
     if (numLiterals != 0) {
+        #if NUM_HEADER_ENCODE
+            ++num_read_first_byte;
+        #endif
         switch (option.encoding) {
             case SHORT_REPEAT:
                 writeShortRepeatValues(option);
@@ -546,6 +551,13 @@ void RleEncoderV2::writeDirectValues(EncodingOption& option) {
 
     // bit packing the zigzag encoded literals
     int64_t* currentZigzagLiterals = isSigned ? zigzagLiterals : literals;
+    #if PRINT_DIRECT_ENCODE
+        std::cout << "Direct encoding: ";
+        for (size_t i = 0; i < numLiterals; i++) {
+            std::cout << currentZigzagLiterals[i] << " ";
+        }
+        std::cout << std::endl;
+    #endif
     writeInts(currentZigzagLiterals, 0, numLiterals, fb);
 
     // reset run length

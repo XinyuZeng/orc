@@ -61,5 +61,10 @@
         "cinttypes": "cpp",
         "typeinfo": "cpp"
     },
-    "cmake.generator": "Unix Makefiles"
+    "cmake.generator": "Unix Makefiles",
+    "C_Cpp.formatting": "Default",
+    "svg.preview.background": "black",
+    "cmake.configureArgs": [
+        "-DSTOP_BUILD_ON_WARNING=OFF"
+    ]
 }

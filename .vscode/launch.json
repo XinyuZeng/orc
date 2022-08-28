@@ -5,7 +5,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/c++/test/rle-test",
-            "args": ["/mnt_nvme/OpenFormat/python/data_gen/idx.txt"],
+            "args": ["/root/OpenFormat/python/data_gen/idx.txt"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],

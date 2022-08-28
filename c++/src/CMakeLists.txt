@@ -229,7 +229,8 @@ set(SOURCE_FILES
   Timezone.cc
   TypeImpl.cc
   Vector.cc
-  Writer.cc)
+  Writer.cc
+  Stats.cc)
 
 if(BUILD_LIBHDFSPP)
   set(SOURCE_FILES ${SOURCE_FILES} OrcHdfsFile.cc)

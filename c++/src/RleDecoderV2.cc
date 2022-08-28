@@ -21,6 +21,8 @@
 #include "RLEv2.hh"
 #include "RLEV2Util.hh"
 #include "Utils.hh"
+#include "Stats.hh"
+#include "Config.hh"
 
 namespace orc {
 
@@ -450,28 +452,85 @@ void RleDecoderV2::next(int64_t* const data,
     if (runRead == runLength) {
       resetRun();
       firstByte = readByte();
+      // #if ORC_NUM_FIRST_BYTE
+      // ++num_read_first_byte;
+      // #endif
     }
 
     uint64_t offset = nRead, length = numValues - nRead;
 
     EncodingType enc = static_cast<EncodingType>
         ((firstByte >> 6) & 0x03);
+    #if ORC_STATS_ENABLE
+    std::chrono::high_resolution_clock::time_point start;
+    uint64_t tmp = 0;
+    #endif
     switch(static_cast<int64_t>(enc)) {
     case SHORT_REPEAT:
+      #if ORC_STATS_ENABLE
+      start = std::chrono::high_resolution_clock::now();
+      tmp = nextShortRepeats(data, offset, length, notNull);
+      time_short_repeats_func += std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                     std::chrono::high_resolution_clock::now() - start)
+                                     .count();
+      num_short_repeats += tmp;
+      ++num_short_repeats_func;
+      #else
       nRead += nextShortRepeats(data, offset, length, notNull);
+      #endif
       break;
     case DIRECT:
+      #if ORC_STATS_ENABLE
+      start = std::chrono::high_resolution_clock::now();
+      tmp = nextDirect(data, offset, length, notNull);
+      time_direct_func += std::chrono::duration_cast<std::chrono::nanoseconds>(
+                              std::chrono::high_resolution_clock::now() - start)
+                              .count();
+      num_direct += tmp;
+      ++num_direct_func;
+      // if (tmp != 0) {
+      //   std::cout << "new direct" << std::endl;
+      //   for (uint64_t i = offset; i < tmp; ++i) {
+      //     std::cout << data[i] << " ";
+      //   }
+      //   std::cout << std::endl;
+      // }
+      #else
       nRead += nextDirect(data, offset, length, notNull);
+      #endif
       break;
     case PATCHED_BASE:
+      #if ORC_STATS_ENABLE
+      start = std::chrono::high_resolution_clock::now();
+      tmp = nextPatched(data, offset, length, notNull);
+      time_patched_base_func += std::chrono::duration_cast<std::chrono::nanoseconds>(
+                               std::chrono::high_resolution_clock::now() - start)
+                               .count();
+      num_patched_base += tmp;
+      ++num_patched_base_func;
+      #else
       nRead += nextPatched(data, offset, length, notNull);
+      #endif
       break;
     case DELTA:
+      #if ORC_STATS_ENABLE
+      start = std::chrono::high_resolution_clock::now();
+      tmp = nextDelta(data, offset, length, notNull);
+      time_delta_func += std::chrono::duration_cast<std::chrono::nanoseconds>(
+                              std::chrono::high_resolution_clock::now() - start)
+                              .count();
+      num_delta += tmp;
+      ++num_delta_func;
+      #else
       nRead += nextDelta(data, offset, length, notNull);
+      #endif
       break;
     default:
       throw ParseError("unknown encoding");
     }
+    #if ORC_STATS_ENABLE
+    nRead += tmp;
+    #endif
   }
 }
 
@@ -507,10 +566,12 @@ uint64_t RleDecoderV2::nextShortRepeats(int64_t* const data,
       }
     }
   } else {
-    for(uint64_t pos = offset; pos < offset + nRead; ++pos) {
-      data[pos] = literals[0];
-      ++runRead;
-    }
+    // for(uint64_t pos = offset; pos < offset + nRead; ++pos) {
+    //   data[pos] = literals[0];
+    //   ++runRead;
+    // }
+    std::fill(data + offset, data+offset+nRead, literals[0]);
+    runRead += nRead;
   }
 
   return nRead;
