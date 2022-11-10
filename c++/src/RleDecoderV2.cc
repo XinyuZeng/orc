@@ -20,6 +20,7 @@
 #include "Compression.hh"
 #include "RLEv2.hh"
 #include "RLEV2Util.hh"
+#include "arrow/util/bpacking.h"
 
 namespace orc {
 
@@ -65,39 +66,45 @@ uint64_t RleDecoderV2::readVulong() {
 }
 
 void RleDecoderV2::readLongs(int64_t *data, uint64_t offset, uint64_t len, uint64_t fbs) {
+  // arrow::internal::unpack64(reinterpret_cast<const uint8_t*>(bufferStart),
+  //                           reinterpret_cast<uint64_t*>(data + offset), len, fbs);
   switch (fbs) {
     case 4:
       unrolledUnpack4(data, offset, len);
-      return;
+      break;
     case 8:
       unrolledUnpack8(data, offset, len);
-      return;
+      break;
     case 16:
       unrolledUnpack16(data, offset, len);
-      return;
+      break;
     case 24:
       unrolledUnpack24(data, offset, len);
-      return;
+      break;
     case 32:
       unrolledUnpack32(data, offset, len);
-      return;
+      break;
     case 40:
       unrolledUnpack40(data, offset, len);
-      return;
+      break;
     case 48:
       unrolledUnpack48(data, offset, len);
-      return;
+      break;
     case 56:
       unrolledUnpack56(data, offset, len);
-      return;
+      break;
     case 64:
       unrolledUnpack64(data, offset, len);
-      return;
+      break;
     default:
       // Fallback to the default implementation for deprecated bit size.
       plainUnpackLongs(data, offset, len, fbs);
-      return;
+      break;
   }
+  // printf("bits len: %ld\n", fbs);
+  // for (uint64_t i = 0; i < len; i++) {
+  //   printf("data[%ld] = %ld\n", i, data[offset + i]);
+  // }
 }
 
 void RleDecoderV2::unrolledUnpack4(int64_t* data, uint64_t offset, uint64_t len) {

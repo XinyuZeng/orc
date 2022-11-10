@@ -183,6 +183,7 @@ include_directories (
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
   ${LIBHDFSPP_INCLUDE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/arrow/util
   )
 
 add_custom_command(OUTPUT orc_proto.pb.h orc_proto.pb.cc
@@ -229,7 +230,9 @@ set(SOURCE_FILES
   Timezone.cc
   TypeImpl.cc
   Vector.cc
-  Writer.cc)
+  Writer.cc
+  Stats.cc
+  arrow/util/bpacking.cc)
 
 if(BUILD_LIBHDFSPP)
   set(SOURCE_FILES ${SOURCE_FILES} OrcHdfsFile.cc)

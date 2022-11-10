@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <Config.hh>
+#include <Stats.hh>
 
 #ifdef _MSC_VER
 #include <io.h>
@@ -72,6 +74,9 @@ namespace orc {
     void read(void* buf,
               uint64_t length,
               uint64_t offset) override {
+      #if ORC_STATS_ENABLE
+      auto start = std::chrono::high_resolution_clock::now();
+      #endif
       if (!buf) {
         throw ParseError("Buffer is null");
       }
@@ -83,6 +88,12 @@ namespace orc {
       if (static_cast<uint64_t>(bytesRead) != length) {
         throw ParseError("Short read of " + filename);
       }
+      #if ORC_STATS_ENABLE
+      time_read += std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                     std::chrono::high_resolution_clock::now() - start)
+                                     .count();
+      num_read++;
+      #endif
     }
 
     const std::string& getName() const override {
