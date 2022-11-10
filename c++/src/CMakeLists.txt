@@ -183,7 +183,6 @@ include_directories (
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
   ${LIBHDFSPP_INCLUDE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/arrow/util
   )
 
 add_custom_command(OUTPUT orc_proto.pb.h orc_proto.pb.cc
@@ -232,7 +231,8 @@ set(SOURCE_FILES
   Vector.cc
   Writer.cc
   Stats.cc
-  arrow/util/bpacking.cc)
+  RleEncoderV3.cc
+  )
 
 if(BUILD_LIBHDFSPP)
   set(SOURCE_FILES ${SOURCE_FILES} OrcHdfsFile.cc)
@@ -241,6 +241,8 @@ endif(BUILD_LIBHDFSPP)
 
 add_library (orc STATIC ${SOURCE_FILES})
 
+find_package(Arrow REQUIRED)
+
 target_link_libraries (orc
   orc::protobuf
   orc::zlib
@@ -248,6 +250,7 @@ target_link_libraries (orc
   orc::lz4
   orc::zstd
   ${LIBHDFSPP_LIBRARIES}
+  arrow_shared
   )
 
 install(TARGETS orc DESTINATION lib)

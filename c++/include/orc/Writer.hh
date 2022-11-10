@@ -41,7 +41,8 @@ namespace orc {
 
   enum RleVersion {
     RleVersion_1 = 0,
-    RleVersion_2 = 1
+    RleVersion_2 = 1,
+    RleVersion_3 = 2
   };
 
   class Timezone;

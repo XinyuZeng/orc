@@ -20,7 +20,7 @@
 #include "Compression.hh"
 #include "RLEv2.hh"
 #include "RLEV2Util.hh"
-#include "arrow/util/bpacking.h"
+// #include "arrow/util/bpacking.h"
 
 namespace orc {
 

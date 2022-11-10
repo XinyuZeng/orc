@@ -35,12 +35,12 @@ target_link_libraries (orc-contents
   orc
   ${CMAKE_THREAD_LIBS_INIT}
   )
-
+# add_library(arrow SHARED IMPORTED)
+# set_target_properties(arrow PROPERTIES IMPORTED_LOCATION /root/arrow-private/cpp/out/build/openformat-release/release/libarrow.so.900.0.0)
 add_executable (orc-scan
   FileScan.cc
   ToolsHelper.cc
   )
-
 target_link_libraries (orc-scan
   orc
   ${CMAKE_THREAD_LIBS_INIT}
