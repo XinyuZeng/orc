@@ -5,11 +5,73 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "filter",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/c++/test/FilterExp",
+            "args": [
+                "/mnt/OpenFormat/python/index/core_r10m_c20.orc",
+                "f11", 
+                "float",
+                "range",
+                "5.797",
+                "294.2527",
+                "one"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "csv import",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/tools/src/csv-import",
+            "args": [
+                "\"struct<f0:bigint,f1:bigint,f2:bigint,f3:bigint,f4:bigint,f5:bigint,f6:bigint,f7:bigint,f8:bigint,f9:bigint,f10:bigint,f11:bigint,f12:bigint,f13:bigint,f14:bigint,f15:bigint,f16:bigint,f17:bigint,f18:bigint,f19:bigint,f20:bigint,f21:bigint,f22:bigint,f23:bigint,f24:bigint,f25:bigint,f26:bigint,f27:bigint,f28:bigint,f29:bigint,f30:bigint,f31:bigint,f32:bigint,f33:bigint,f34:bigint,f35:bigint,f36:bigint,f37:bigint,f38:bigint,f39:bigint,f40:bigint,f41:bigint,f42:bigint,f43:bigint,f44:bigint,f45:bigint,f46:bigint,f47:bigint,f48:bigint,f49:bigint,f50:bigint,f51:bigint,f52:bigint,f53:bigint,f54:bigint,f55:bigint,f56:bigint,f57:bigint,f58:bigint,f59:bigint,f60:bigint,f61:bigint,f62:bigint,f63:bigint,f64:bigint,f65:bigint,f66:bigint,f67:bigint,f68:bigint,f69:bigint,f70:bigint,f71:bigint,f72:bigint,f73:bigint,f74:bigint,f75:bigint,f76:bigint,f77:bigint,f78:bigint,f79:bigint,f80:bigint,f81:bigint,f82:bigint,f83:bigint,f84:bigint,f85:bigint,f86:bigint,f87:bigint,f88:bigint,f89:bigint,f90:bigint,f91:bigint,f92:bigint,f93:bigint,f94:bigint,f95:bigint,f96:bigint,f97:bigint,f98:bigint,f99:bigint,f100:bigint,f101:bigint,f102:bigint,f103:bigint,f104:bigint,f105:bigint,f106:bigint,f107:bigint,f108:double,f109:double,f110:double,f111:double,f112:double,f113:double,f114:double,f115:double,f116:double,f117:double,f118:double,f119:double,f120:double,f121:double,f122:double,f123:double,f124:double,f125:double,f126:double,f127:double,f128:double,f129:double,f130:double,f131:double,f132:double,f133:double,f134:double,f135:double,f136:double,f137:double,f138:double,f139:double,f140:double,f141:double,f142:double,f143:double,f144:double,f145:double,f146:double,f147:double,f148:double,f149:double,f150:double,f151:double,f152:double,f153:double,f154:double,f155:double,f156:double,f157:double,f158:double,f159:double,f160:double,f161:double,f162:double,f163:double,f164:double,f165:double,f166:double,f167:double,f168:double,f169:double,f170:double,f171:double,f172:double,f173:double,f174:double,f175:double,f176:double,f177:double,f178:double,f179:double,f180:double,f181:double,f182:double,f183:double,f184:double,f185:double,f186:double,f187:double,f188:double,f189:double,f190:double,f191:double,f192:double,f193:double,f194:double,f195:double,f196:double,f197:double,f198:double,f199:double,f200:double,f201:double,f202:double,f203:double,f204:double,f205:double,f206:double,f207:double,f208:double,f209:double,f210:double,f211:double,f212:double,f213:double,f214:double,f215:double,f216:double,f217:double,f218:double,f219:double,f220:double,f221:double,f222:double,f223:double,f224:double,f225:double,f226:double,f227:double,f228:double,f229:double,f230:double,f231:double,f232:double,f233:double,f234:double,f235:double,f236:double,f237:double,f238:double,f239:double,f240:double,f241:string,f242:string,f243:string,f244:string,f245:string,f246:string,f247:string,f248:string,f249:string,f250:string,f251:string,f252:string,f253:string,f254:string,f255:string,f256:string,f257:string,f258:string,f259:string,f260:string,f261:string,f262:string,f263:string,f264:string,f265:string,f266:string,f267:string,f268:string,f269:string,f270:string,f271:string,f272:string,f273:string,f274:string,f275:string,f276:string,f277:string,f278:string,f279:string,f280:string,f281:string,f282:string,f283:string,f284:string,f285:string,f286:string,f287:string,f288:string,f289:string,f290:string,f291:string,f292:string,f293:string,f294:string,f295:string,f296:string,f297:string,f298:string,f299:string,f300:string,f301:string,f302:string,f303:string,f304:string,f305:string,f306:string,f307:string,f308:string,f309:string,f310:string,f311:string,f312:string,f313:string,f314:string,f315:string,f316:string,f317:string,f318:string,f319:string,f320:string,f321:string,f322:string,f323:string,f324:string,f325:string,f326:string,f327:string,f328:string,f329:string,f330:string,f331:string,f332:string,f333:string,f334:string,f335:string,f336:string,f337:string,f338:string,f339:string,f340:string,f341:string,f342:string,f343:string,f344:string,f345:string,f346:string,f347:string,f348:string,f349:string,f350:string,f351:string,f352:string,f353:string,f354:string,f355:string,f356:string,f357:string,f358:string,f359:string,f360:string,f361:string,f362:string,f363:string,f364:string,f365:string,f366:string,f367:string,f368:string,f369:string,f370:string,f371:string,f372:string,f373:string,f374:string,f375:string,f376:string,f377:string,f378:string,f379:string,f380:string,f381:string,f382:string,f383:string,f384:string,f385:string,f386:string,f387:string,f388:string,f389:string,f390:string,f391:string,f392:string,f393:string,f394:string,f395:string,f396:string,f397:string,f398:string,f399:string>\"",
+                "/mnt/OpenFormat/python/wide_table/core_r100000_c400/gen_data/core_r100000_c400.csv", 
+                "res.orc"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        
+    
+        {
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/tools/src/orc-scan",
-            "args": ["/root/OpenFormat/python/core/string_core_UNCOMPRESSED_speed_1_2147486647.orc"],
+            "args": ["/mnt/OpenFormat/python/index/core_r10m_c20.orc"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],

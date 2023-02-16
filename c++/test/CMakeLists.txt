@@ -64,9 +64,23 @@ add_executable (create-test-files
   CreateTestFiles.cc
 )
 
+
 target_link_libraries (create-test-files
   orc
   orc::protobuf
+)
+
+add_executable(FilterExp
+  FilterExp.cc
+)
+
+target_link_libraries (FilterExp
+orc
+orc::lz4
+orc::protobuf
+orc::snappy
+orc::zlib
+orc::gmock
 )
 
 if (TEST_VALGRIND_MEMCHECK)

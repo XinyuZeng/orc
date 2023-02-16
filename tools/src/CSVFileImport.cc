@@ -293,10 +293,10 @@ int main(int argc, char* argv[]) {
   std::string output;
   std::string schema;
   std::string timezoneName="GMT";
-  uint64_t stripeSize = (128 << 20); // 128M
+  uint64_t stripeSize = (64 << 20); // 64M
   uint64_t blockSize = 64 << 10;     // 64K
   uint64_t batchSize = 1024;
-  orc::CompressionKind compression = orc::CompressionKind_ZLIB;
+  orc::CompressionKind compression = orc::CompressionKind_SNAPPY;
 
   static struct option longOptions[] = {
     {"help", no_argument, ORC_NULLPTR, 'h'},
@@ -373,6 +373,7 @@ int main(int argc, char* argv[]) {
   options.setCompressionBlockSize(blockSize);
   options.setCompression(compression);
   options.setTimezoneName(timezoneName);
+  options.setDictionaryKeySizeThreshold(0.8);
 
   ORC_UNIQUE_PTR<orc::OutputStream> outStream = orc::writeLocalFile(output);
   ORC_UNIQUE_PTR<orc::Writer> writer =
