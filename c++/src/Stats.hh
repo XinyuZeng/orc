@@ -8,6 +8,7 @@
 namespace orc {
 extern uint64_t num_read;
 extern int64_t time_read;
+extern int64_t time_meta;
 }  // namespace orc
 
 #endif

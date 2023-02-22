@@ -33,6 +33,8 @@
 #include <vector>
 #include <iterator>
 #include <set>
+#include <chrono>
+#include "Stats.hh"
 
 namespace orc {
   // ORC files writen by these versions of cpp writers have inconsistent bloom filter
@@ -813,6 +815,7 @@ namespace orc {
   }
 
   void ReaderImpl::readMetadata() const {
+    // auto begin = std::chrono::steady_clock::now();
     uint64_t metadataSize = contents->postscript->metadatalength();
     uint64_t footerLength = contents->postscript->footerlength();
     if (fileLength < metadataSize + footerLength + postscriptLength + 1) {
@@ -838,6 +841,7 @@ namespace orc {
         throw ParseError("Failed to parse the metadata");
       }
     }
+    // time_meta += (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin)).count();
     isMetadataLoaded = true;
   }
 
@@ -1050,6 +1054,7 @@ namespace orc {
   }
 
   void RowReaderImpl::startNextStripe() {
+    // auto begin = std::chrono::steady_clock::now();
     reader.reset(); // ColumnReaders use lots of memory; free old memory first
     rowIndexes.clear();
     bloomFilterIndex.clear();
@@ -1136,6 +1141,8 @@ namespace orc {
       // All remaining stripes are skipped.
       markEndOfFile();
     }
+    // time_meta += std::chrono::duration_cast<std::chrono::microseconds>(
+    //   std::chrono::steady_clock::now() - begin).count();
   }
 
   bool RowReaderImpl::next(ColumnVectorBatch& data) {

@@ -19,6 +19,8 @@
 #include <iostream>
 #include <string>
 #include <chrono>
+#include <string_view>
+#include <algorithm>
 
 #include "Adaptor.hh"
 #include "MemoryInputStream.hh"
@@ -37,7 +39,7 @@ int main(int argc, char **argv)
 {
   // MemoryPool *pool = getDefaultPool();
   // assert(argc == 2);
-  if (argc != 8) {
+  if (argc != 8 && argc != 9) {
     std::cout << "Usage: " << argv[0] << " <file_name> <col_name> <data_type> <filter_type> <v1> <v2> <proj_type>" << std::endl;
     return 1;
   }
@@ -48,6 +50,29 @@ int main(int argc, char **argv)
   std::string v1 = argv[5]; // 
   std::string v2 = argv[6]; // 
   std::string proj_type = argv[7];
+  bool eval = false;
+  if (argc >= 9) {
+    eval = true;
+  }
+
+  // allocate vector of bool with value false and length 1024
+  std::vector<bool> select_vec = std::vector<bool>(1024, false);
+  double v1d, v2d;
+  int64_t v1i, v2i;
+  std::string v1s, v2s;
+  if (data_type == "float") {
+    v1d = std::atof(v1.c_str());
+    v2d = std::atof(v2.c_str());
+  } else if (data_type == "int") {
+    v1i = std::atoll(v1.c_str());
+    v2i = std::atoll(v2.c_str());
+  } else if (data_type == "string") {
+    v1s = v1;
+    v2s = v2;
+  } else {
+    std::cout << "data_type must be int, float, or string" << std::endl;
+    return 1;
+  }
 
   auto begin = std::chrono::steady_clock::now();
   ReaderOptions readerOpts;
@@ -132,6 +157,48 @@ int main(int argc, char **argv)
     // std::cout << "read out a batch, size:" << readBatch->numElements <<
     // std::endl;
     cnt += readBatch->numElements;
+    if (eval) {
+      auto struct_batch = dynamic_cast<StructVectorBatch *>(readBatch.get());
+      if (data_type == "float"){
+        auto double_batch = dynamic_cast<DoubleVectorBatch *>(struct_batch->fields[0]);
+        for (int i = 0; i < readBatch->numElements; ++i) {
+            double val = double_batch->data[i];
+            if (val >= v1d && val <= v2d) {
+              select_vec[i] = true;
+            }else {
+            select_vec[i] = false;
+          }
+        }
+      } else if (data_type == "int") {
+        auto long_batch = dynamic_cast<LongVectorBatch *>(struct_batch->fields[0]);
+        for (int i = 0; i < readBatch->numElements; ++i) {
+            int64_t val = long_batch->data[i];
+            if (val >= v1i && val <= v2i) {
+              select_vec[i] = true;
+            }else {
+            select_vec[i] = false;
+          }
+        }
+      } else if (data_type == "string") {
+        auto string_batch = dynamic_cast<StringVectorBatch *>(struct_batch->fields[0]);
+        for (int i = 0; i < readBatch->numElements; ++i) {
+          if (string_batch->hasNulls && string_batch->notNull[i] == false) {
+            select_vec[i] = false;
+            continue;
+          }
+          if (strcmp(string_batch->data[i], v1s.c_str()) >= 0 &&
+              strcmp(string_batch->data[i], v2s.c_str()) <= 0) {
+              select_vec[i] = true;
+          } else {
+            select_vec[i] = false;
+          }
+            // std::string_view val(string_batch->data[i], string_batch->length[i]);
+            // if (val >= v1s && val <= v2s) {
+            //   select_vec[i] = true;
+            // }
+        }
+      }
+    }
     // auto& batch0 = dynamic_cast<LongVectorBatch&>(*readBatch);
     // batch0.data
     // if (cnt == 9139168)
