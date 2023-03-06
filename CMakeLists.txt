@@ -60,6 +60,20 @@ option(BUILD_POSITION_INDEPENDENT_LIB
     "Compile static libraries with position independent code"
     OFF)
 
+option(ORC_STATS_ENABLE "my profileing macro" OFF)
+
+option(ORC_NESTED_STATS_ENABLE "nested profiling macro" OFF)
+
+if (ORC_STATS_ENABLE)
+  message(STATUS "My profiling Stats enabled")
+  add_compile_definitions(ORC_STATS_ENABLE)
+endif()
+
+if (ORC_NESTED_STATS_ENABLE)
+  message(STATUS "Nested stats enabled")
+  add_compile_definitions(ORC_NESTED_STATS_ENABLE)
+endif()
+
 # Make sure that a build type is selected
 if (NOT CMAKE_BUILD_TYPE)
   message(STATUS "No build type selected, default to ReleaseWithDebugInfo")

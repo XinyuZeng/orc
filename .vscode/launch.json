@@ -101,11 +101,11 @@
         
     
         {
-            "name": "(gdb) Launch",
+            "name": "general",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/tools/src/orc-scan",
-            "args": ["/mnt/OpenFormat/python/index/core_r10m_c20.orc"],
+            "program": "${workspaceFolder}/build-debug/tools/src/orc-scan",
+            "args": ["/mnt/OpenFormat/python/general/core_r1000000_c20.orc"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],

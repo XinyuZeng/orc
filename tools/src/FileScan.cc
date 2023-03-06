@@ -62,6 +62,7 @@ int main(int argc, char* argv[]) {
       return 1;
     }
   }
+  std::cout << "total levels time: " << orc::time_levels << "ns" << std::endl;
   #if ORC_STATS_ENABLE
   std::cout << "total read time: " << orc::time_read << "ns" << std::endl;
   std::cout << "total read cnt: " << orc::num_read << std::endl;

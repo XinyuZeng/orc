@@ -23,6 +23,8 @@
 #include "ColumnReader.hh"
 #include "orc/Exceptions.hh"
 #include "RLE.hh"
+#include "Stats.hh"
+#include "Config.hh"
 
 #include <math.h>
 #include <iostream>
@@ -90,6 +92,9 @@ namespace orc {
   void ColumnReader::next(ColumnVectorBatch& rowBatch,
                           uint64_t numValues,
                           char* incomingMask) {
+    #if ORC_NESTED_STATS_ENABLE
+    auto start = std::chrono::steady_clock::now();
+    #endif
     if (numValues > rowBatch.capacity) {
       rowBatch.resize(numValues);
     }
@@ -102,6 +107,10 @@ namespace orc {
       for(uint64_t i=0; i < numValues; ++i) {
         if (!notNullArray[i]) {
           rowBatch.hasNulls = true;
+          #if ORC_NESTED_STATS_ENABLE
+          time_levels += std::chrono::duration_cast<std::chrono::nanoseconds>(
+              std::chrono::steady_clock::now() - start).count();
+          #endif
           return;
         }
       }
@@ -109,9 +118,17 @@ namespace orc {
       // If we don't have a notNull stream, copy the incomingMask
       rowBatch.hasNulls = true;
       memcpy(rowBatch.notNull.data(), incomingMask, numValues);
+      #if ORC_NESTED_STATS_ENABLE
+      time_levels += std::chrono::duration_cast<std::chrono::nanoseconds>(
+          std::chrono::steady_clock::now() - start).count();
+      #endif
       return;
     }
     rowBatch.hasNulls = false;
+    #if ORC_NESTED_STATS_ENABLE
+    time_levels += std::chrono::duration_cast<std::chrono::nanoseconds>(
+        std::chrono::steady_clock::now() - start).count();
+    #endif
   }
 
   void ColumnReader::seekToRowGroup(
@@ -1093,6 +1110,9 @@ namespace orc {
                               uint64_t numValues,
                               char *notNull) {
     ColumnReader::next(rowBatch, numValues, notNull);
+    #if ORC_NESTED_STATS_ENABLE
+    auto start = std::chrono::steady_clock::now();
+    #endif
     ListVectorBatch &listBatch = dynamic_cast<ListVectorBatch&>(rowBatch);
     int64_t* offsets = listBatch.offsets.data();
     notNull = listBatch.hasNulls ? listBatch.notNull.data() : nullptr;
@@ -1117,6 +1137,10 @@ namespace orc {
     }
     offsets[numValues] = static_cast<int64_t>(totalChildren);
     ColumnReader *childReader = child.get();
+    #if ORC_NESTED_STATS_ENABLE
+    time_levels += std::chrono::duration_cast<std::chrono::nanoseconds>(
+        std::chrono::steady_clock::now() - start).count();
+    #endif
     if (childReader) {
       if (encoded) {
         childReader->nextEncoded(*(listBatch.elements.get()), totalChildren, nullptr);
