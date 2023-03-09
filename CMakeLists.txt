@@ -63,6 +63,7 @@ option(BUILD_POSITION_INDEPENDENT_LIB
 option(ORC_STATS_ENABLE "my profileing macro" OFF)
 
 option(ORC_NESTED_STATS_ENABLE "nested profiling macro" OFF)
+option(ORC_DECODE_PROF "decoding profiling macro" ON)
 
 if (ORC_STATS_ENABLE)
   message(STATUS "My profiling Stats enabled")
@@ -74,6 +75,9 @@ if (ORC_NESTED_STATS_ENABLE)
   add_compile_definitions(ORC_NESTED_STATS_ENABLE)
 endif()
 
+if (ORC_DECODE_PROF)
+  add_compile_definitions(ORC_DECODE_PROF)
+endif()
 # Make sure that a build type is selected
 if (NOT CMAKE_BUILD_TYPE)
   message(STATUS "No build type selected, default to ReleaseWithDebugInfo")

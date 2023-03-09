@@ -105,7 +105,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build-debug/tools/src/orc-scan",
-            "args": ["/mnt/OpenFormat/python/general/core_r1000000_c20.orc"],
+            "args": ["/mnt/OpenFormat/python/general/ml_r1000000_c20.orc"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],

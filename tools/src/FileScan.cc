@@ -26,12 +26,14 @@
 void scanFile(std::ostream & out, const char* filename, uint64_t batchSize,
               const orc::RowReaderOptions& rowReaderOpts) {
   orc::ReaderOptions readerOpts;
-  auto begin = std::chrono::steady_clock::now();
   std::unique_ptr<orc::Reader> reader =
     orc::createReader(orc::readFile(filename), readerOpts);
   std::unique_ptr<orc::RowReader> rowReader = reader->createRowReader(rowReaderOpts);
+  auto begin = std::chrono::steady_clock::now();
   std::unique_ptr<orc::ColumnVectorBatch> batch =
     rowReader->createRowBatch(batchSize);
+  auto alloc_end = std::chrono::steady_clock::now();
+  auto begin2 = std::chrono::steady_clock::now();
 
   unsigned long rows = 0;
   unsigned long batches = 0;
@@ -39,13 +41,14 @@ void scanFile(std::ostream & out, const char* filename, uint64_t batchSize,
     batches += 1;
     rows += batch->numElements;
   }
-  out << "read orc(s): " << (static_cast<std::chrono::duration<double>>(std::chrono::steady_clock::now() - begin)).count() <<std::endl;
+  out << "read orc(s): " << (static_cast<std::chrono::duration<double>>(std::chrono::steady_clock::now() - begin2)).count() <<std::endl;
+  out << "alloc batch(s): " << (static_cast<std::chrono::duration<double>>(alloc_end - begin)).count() <<std::endl;
   out << "Rows: " << rows << std::endl;
   out << "Batches: " << batches << std::endl;
 }
 
 int main(int argc, char* argv[]) {
-  uint64_t batchSize = 1024;
+  uint64_t batchSize = 64 * 1024;
   orc::RowReaderOptions rowReaderOptions;
   bool success = parseOptions(&argc, &argv, &batchSize, &rowReaderOptions);
   if (argc < 1 || !success) {
@@ -63,6 +66,7 @@ int main(int argc, char* argv[]) {
     }
   }
   std::cout << "total levels time: " << orc::time_levels << "ns" << std::endl;
+  std::cout << "total decode time: " << orc::time_decode << "ns" << std::endl;
   #if ORC_STATS_ENABLE
   std::cout << "total read time: " << orc::time_read << "ns" << std::endl;
   std::cout << "total read cnt: " << orc::num_read << std::endl;

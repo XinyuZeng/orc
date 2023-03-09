@@ -307,8 +307,15 @@ namespace orc {
                                  uint64_t numValues,
                                  char *notNull) {
     ColumnReader::next(rowBatch, numValues, notNull);
+    #if ORC_DECODE_PROF
+    auto start = std::chrono::steady_clock::now();
+    #endif
     rle->next(dynamic_cast<LongVectorBatch&>(rowBatch).data.data(),
               numValues, rowBatch.hasNulls ? rowBatch.notNull.data() : nullptr);
+    #if ORC_DECODE_PROF
+    time_decode += std::chrono::duration_cast<std::chrono::nanoseconds>(
+        std::chrono::steady_clock::now() - start).count();
+    #endif
   }
 
   void IntegerColumnReader::seekToRowGroup(
@@ -550,6 +557,9 @@ namespace orc {
       uint64_t numValues,
       char *notNull) {
     ColumnReader::next(rowBatch, numValues, notNull);
+    #if ORC_DECODE_PROF
+    auto start = std::chrono::steady_clock::now();
+    #endif
     // update the notNull from the parent class
     notNull = rowBatch.hasNulls ? rowBatch.notNull.data() : nullptr;
     double* outArray = dynamic_cast<DoubleVectorBatch&>(rowBatch).data.data();
@@ -589,6 +599,10 @@ namespace orc {
         }
       }
     }
+    #if ORC_DECODE_PROF
+    time_decode += std::chrono::duration_cast<std::chrono::nanoseconds>(
+        std::chrono::steady_clock::now() - start).count();
+    #endif
   }
 
   template<TypeKind columnKind, bool isLittleEndian>
@@ -695,6 +709,9 @@ namespace orc {
                                           uint64_t numValues,
                                           char *notNull) {
     ColumnReader::next(rowBatch, numValues, notNull);
+    #if ORC_DECODE_PROF
+    auto start = std::chrono::steady_clock::now();
+    #endif
     // update the notNull from the parent class
     notNull = rowBatch.hasNulls ? rowBatch.notNull.data() : nullptr;
     StringVectorBatch& byteBatch = dynamic_cast<StringVectorBatch&>(rowBatch);
@@ -727,6 +744,10 @@ namespace orc {
           dictionaryOffsets[entry];
       }
     }
+    #if ORC_DECODE_PROF
+    time_decode += std::chrono::duration_cast<std::chrono::nanoseconds>(
+        std::chrono::steady_clock::now() - start).count();
+    #endif
   }
 
   void StringDictionaryColumnReader::nextEncoded(ColumnVectorBatch& rowBatch,
