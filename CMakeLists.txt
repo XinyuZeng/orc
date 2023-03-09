@@ -63,7 +63,7 @@ option(BUILD_POSITION_INDEPENDENT_LIB
 option(ORC_STATS_ENABLE "my profileing macro" OFF)
 
 option(ORC_NESTED_STATS_ENABLE "nested profiling macro" OFF)
-option(ORC_DECODE_PROF "decoding profiling macro" ON)
+option(ORC_DECODE_PROF "decoding profiling macro" OFF)
 
 if (ORC_STATS_ENABLE)
   message(STATUS "My profiling Stats enabled")

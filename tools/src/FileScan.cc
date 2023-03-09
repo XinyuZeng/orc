@@ -48,7 +48,7 @@ void scanFile(std::ostream & out, const char* filename, uint64_t batchSize,
 }
 
 int main(int argc, char* argv[]) {
-  uint64_t batchSize = 64 * 1024;
+  uint64_t batchSize = 1024;
   orc::RowReaderOptions rowReaderOptions;
   bool success = parseOptions(&argc, &argv, &batchSize, &rowReaderOptions);
   if (argc < 1 || !success) {
