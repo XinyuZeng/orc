@@ -37,8 +37,6 @@ using namespace orc;
 
 int main(int argc, char **argv)
 {
-  // MemoryPool *pool = getDefaultPool();
-  // assert(argc == 2);
   if (argc != 8 && argc != 9) {
     std::cout << "Usage: " << argv[0] << " <file_name> <col_name> <data_type> <filter_type> <v1> <v2> <proj_type>" << std::endl;
     return 1;
@@ -55,7 +53,6 @@ int main(int argc, char **argv)
     eval = true;
   }
 
-  // allocate vector of bool with value false and length 1024
   std::vector<bool> select_vec = std::vector<bool>(1024, false);
   double v1d, v2d;
   int64_t v1i, v2i;
@@ -131,31 +128,13 @@ int main(int argc, char **argv)
           .build();
     }
   }
-      // SearchArgumentFactory::newBuilder()
-      //     ->startAnd()
-      //     .equals(col_name, PredicateDataType::LONG, Literal(static_cast<int64_t>(std::atoll(filter_val.c_str()))))
-        //   .equals(col_name, PredicateDataType::STRING, Literal(filter_val.c_str(), filter_val.size()))
-          // .lessThan("l_quantity", PredicateDataType::LONG,
-          //           Literal(static_cast<int64_t>(24L)))
-        //   .between("l_shipdate", PredicateDataType::STRING,
-        //            Literal(min_date.c_str(), 10), Literal(max_date.c_str(), 10))
-          // .end()
-          // .build();
   rowReaderOpts.searchArgument(std::move(sarg));
   auto rowReader = reader->createRowReader(rowReaderOpts);
   auto readBatch = rowReader->createRowBatch(1024);
-  // EXPECT_EQ(true, rowReader->next(*readBatch));
-
-  // NOTE: printer
-  // std::string line;
-  // std::unique_ptr<orc::ColumnPrinter> printer =
-  //   createColumnPrinter(line, &rowReader->getSelectedType());
   
   uint64_t cnt = 0;
   while (rowReader->next(*readBatch))
   {
-    // std::cout << "read out a batch, size:" << readBatch->numElements <<
-    // std::endl;
     cnt += readBatch->numElements;
     if (eval) {
       auto struct_batch = dynamic_cast<StructVectorBatch *>(readBatch.get());
@@ -192,30 +171,9 @@ int main(int argc, char **argv)
           } else {
             select_vec[i] = false;
           }
-            // std::string_view val(string_batch->data[i], string_batch->length[i]);
-            // if (val >= v1s && val <= v2s) {
-            //   select_vec[i] = true;
-            // }
         }
       }
     }
-    // auto& batch0 = dynamic_cast<LongVectorBatch&>(*readBatch);
-    // batch0.data
-    // if (cnt == 9139168)
-    // {
-    //   std::cout << "read out 9139168 rows" << std::endl;
-    // }
-    // assert(true);
-
-    // NOTE: printer
-    // printer->reset(*readBatch);
-    // for(unsigned long i=0; i < readBatch->numElements; ++i) {
-    //   line.clear();
-    //   printer->printRow(i);
-    //   line += "\n";
-    //   const char* str = line.c_str();
-    //   fwrite(str, 1, strlen(str), stdout);
-    // }
   }
 
   std::cout << "read orc(s): " << (static_cast<std::chrono::duration<double>>(std::chrono::steady_clock::now() - begin)).count() <<std::endl;
