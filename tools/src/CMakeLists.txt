@@ -46,6 +46,16 @@ target_link_libraries (orc-scan
   ${CMAKE_THREAD_LIBS_INIT}
   )
 
+  add_executable (orc-scan-full
+  FileScanToBatches.cc
+  ToolsHelper.cc
+  )
+
+target_link_libraries (orc-scan-full
+  orc
+  ${CMAKE_THREAD_LIBS_INIT}
+  )
+
 add_executable (orc-metadata
   FileMetadata.cc
   ToolsHelper.cc
