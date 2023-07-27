@@ -67,6 +67,14 @@ int main(int argc, char* argv[]) {
   }
   std::cout << "total levels time: " << orc::time_levels << "ns" << std::endl;
   std::cout << "total decode time: " << orc::time_decode << "ns" << std::endl;
+  std::cout << "n_short_repeats: " << orc::n_short_repeats << std::endl;
+  std::cout << "n_direct: " << orc::n_direct << std::endl;
+  std::cout << "n_patched: " << orc::n_patched << std::endl;
+  std::cout << "n_delta: " << orc::n_delta << std::endl;
+  std::cout << "n_short_repeats_seq: " << orc::n_short_repeats_seq << std::endl;
+  std::cout << "n_direct_seq: " << orc::n_direct_seq << std::endl;
+  std::cout << "n_patched_seq: " << orc::n_patched_seq << std::endl;
+  std::cout << "n_delta_seq: " << orc::n_delta_seq << std::endl;
   #if ORC_STATS_ENABLE
   std::cout << "total read time: " << orc::time_read << "ns" << std::endl;
   std::cout << "total read cnt: " << orc::num_read << std::endl;

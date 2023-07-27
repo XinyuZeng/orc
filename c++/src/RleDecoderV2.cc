@@ -20,6 +20,7 @@
 #include "Compression.hh"
 #include "RLEv2.hh"
 #include "RLEV2Util.hh"
+#include "Stats.hh"
 #include "arrow/util/bpacking.h"
 
 namespace orc {
@@ -476,6 +477,57 @@ void RleDecoderV2::next(int64_t* const data,
     }
   }
 }
+
+// void RleDecoderV2::next(int64_t* const data,
+//                         const uint64_t numValues,
+//                         const char* const notNull) {
+//   uint64_t nRead = 0;
+//   uint64_t tmp = 0;
+
+//   while (nRead < numValues) {
+//     // Skip any nulls before attempting to read first byte.
+//     while (notNull && !notNull[nRead]) {
+//       if (++nRead == numValues) {
+//         return; // ended with null values
+//       }
+//     }
+
+//     if (runRead == runLength) {
+//       resetRun();
+//       firstByte = readByte();
+//     }
+
+//     uint64_t offset = nRead, length = numValues - nRead;
+
+//     EncodingType enc = static_cast<EncodingType>
+//         ((firstByte >> 6) & 0x03);
+//     switch(static_cast<int64_t>(enc)) {
+//     case SHORT_REPEAT:
+//       tmp = nextShortRepeats(data, offset, length, notNull);
+//       n_short_repeats += tmp;
+//       n_short_repeats_seq++;
+//       break;
+//     case DIRECT:
+//       tmp = nextDirect(data, offset, length, notNull);
+//       n_direct += tmp;
+//       n_direct_seq++;
+//       break;
+//     case PATCHED_BASE:
+//       tmp = nextPatched(data, offset, length, notNull);
+//       n_patched += tmp;
+//       n_patched_seq++;
+//       break;
+//     case DELTA:
+//       tmp = nextDelta(data, offset, length, notNull);
+//       n_delta += tmp;
+//       n_delta_seq++;
+//       break;
+//     default:
+//       throw ParseError("unknown encoding");
+//     }
+//     nRead += tmp;
+//   }
+// }
 
 uint64_t RleDecoderV2::nextShortRepeats(int64_t* const data,
                                         uint64_t offset,

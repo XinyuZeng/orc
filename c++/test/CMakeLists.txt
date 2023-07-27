@@ -83,6 +83,19 @@ orc::zlib
 orc::gmock
 )
 
+add_executable(FilterExpRevision
+FilterExpRevision.cc
+)
+
+target_link_libraries (FilterExpRevision
+orc
+orc::lz4
+orc::protobuf
+orc::snappy
+orc::zlib
+orc::gmock
+)
+
 if (TEST_VALGRIND_MEMCHECK)
   add_test (orc-test
           valgrind --tool=memcheck --leak-check=full --error-exitcode=1 ./orc-test)
