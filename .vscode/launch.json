@@ -123,6 +123,59 @@
                     "ignoreFailures": true
                 }
             ]
+        },
+        
+    
+        {
+            "name": "nested",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build-debug/tools/src/orc-scan",
+            "args": ["/mnt/OpenFormat/python/nested/example.orc"],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        
+    
+        {
+            "name": "selection",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/Debug/c++/test/SelectionScanMultiFiles",
+            // "args": ["/io1/laion_100m_orc/0000.orc", "url,caption", "09646,208366"],
+            "args": ["/io1/laion_100m_orc/test.json"],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
         }
 
     ]

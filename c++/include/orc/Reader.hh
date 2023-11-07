@@ -576,6 +576,9 @@ namespace orc {
      */
     virtual bool next(ColumnVectorBatch& data) = 0;
 
+    virtual bool nextWithSelection(ColumnVectorBatch& data, const std::vector<uint64_t>& rows) = 0;
+
+
     /**
      * Get the row number of the first row in the previously read batch.
      * @return the row number of the previous batch.

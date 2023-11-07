@@ -66,5 +66,7 @@
     "svg.preview.background": "black",
     "cmake.configureArgs": [
         "-DSTOP_BUILD_ON_WARNING=OFF"
-    ]
+    ],
+    "cmake.buildDirectory": "${workspaceFolder}/build/",
+    "java.compile.nullAnalysis.mode": "disabled"
 }

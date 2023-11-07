@@ -218,6 +218,8 @@ namespace orc {
                                                       ) const override;
 
     bool next(ColumnVectorBatch& data) override;
+    bool nextWithSelection(ColumnVectorBatch& data, const std::vector<uint64_t>& rows) override;
+
 
     CompressionKind getCompression() const;
 

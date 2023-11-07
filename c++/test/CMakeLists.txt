@@ -96,6 +96,33 @@ orc::zlib
 orc::gmock
 )
 
+add_executable(SelectionScan
+SelectionScan.cc
+)
+
+target_link_libraries (SelectionScan
+orc
+orc::lz4
+orc::protobuf
+orc::snappy
+orc::zlib
+orc::gmock
+)
+
+
+add_executable(SelectionScanMultiFiles
+SelectionScanMultiFiles.cc
+)
+
+target_link_libraries (SelectionScanMultiFiles
+orc
+orc::lz4
+orc::protobuf
+orc::snappy
+orc::zlib
+orc::gmock
+)
+
 if (TEST_VALGRIND_MEMCHECK)
   add_test (orc-test
           valgrind --tool=memcheck --leak-check=full --error-exitcode=1 ./orc-test)

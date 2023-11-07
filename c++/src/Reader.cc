@@ -516,6 +516,7 @@ namespace orc {
 
   proto::StripeFooter getStripeFooter(const proto::StripeInformation& info,
                                       const FileContents& contents) {
+    auto begin = std::chrono::steady_clock::now();
     uint64_t stripeFooterStart = info.offset() + info.indexlength() +
       info.datalength();
     uint64_t stripeFooterLength = info.footerlength();
@@ -540,6 +541,9 @@ namespace orc {
           << contents.footer->types_size() << ", actual=" << result.columns_size();
       throw ParseError(msg.str());
     }
+
+    time_meta += std::chrono::duration_cast<std::chrono::microseconds>(
+      std::chrono::steady_clock::now() - begin).count();
     return result;
   }
 
@@ -815,7 +819,7 @@ namespace orc {
   }
 
   void ReaderImpl::readMetadata() const {
-    // auto begin = std::chrono::steady_clock::now();
+    auto begin = std::chrono::steady_clock::now();
     uint64_t metadataSize = contents->postscript->metadatalength();
     uint64_t footerLength = contents->postscript->footerlength();
     if (fileLength < metadataSize + footerLength + postscriptLength + 1) {
@@ -841,7 +845,7 @@ namespace orc {
         throw ParseError("Failed to parse the metadata");
       }
     }
-    // time_meta += (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin)).count();
+    time_meta += (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin)).count();
     isMetadataLoaded = true;
   }
 
@@ -1054,7 +1058,7 @@ namespace orc {
   }
 
   void RowReaderImpl::startNextStripe() {
-    // auto begin = std::chrono::steady_clock::now();
+    auto begin = std::chrono::steady_clock::now();
     reader.reset(); // ColumnReaders use lots of memory; free old memory first
     rowIndexes.clear();
     bloomFilterIndex.clear();
@@ -1124,7 +1128,10 @@ namespace orc {
                                       *contents->stream,
                                       writerTimezone,
                                       readerTimezone);
+      auto begin2 = std::chrono::steady_clock::now();
       reader = buildReader(*contents->schema, stripeStreams);
+      time_buildReader += std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::steady_clock::now() - begin2).count();
 
       if (sargsApplier) {
         // move to the 1st selected row group when PPD is enabled.
@@ -1141,8 +1148,8 @@ namespace orc {
       // All remaining stripes are skipped.
       markEndOfFile();
     }
-    // time_meta += std::chrono::duration_cast<std::chrono::microseconds>(
-    //   std::chrono::steady_clock::now() - begin).count();
+    time_startNextStripe += std::chrono::duration_cast<std::chrono::microseconds>(
+      std::chrono::steady_clock::now() - begin).count();
   }
 
   bool RowReaderImpl::next(ColumnVectorBatch& data) {
@@ -1199,6 +1206,88 @@ namespace orc {
       currentRowInStripe = 0;
     }
     return rowsToRead != 0;
+  }
+
+
+  bool RowReaderImpl::nextWithSelection(ColumnVectorBatch& data, const std::vector<uint64_t>& bitpos) {
+    uint64_t row_index = 0;
+    uint64_t total_true_read = 0;
+    while (currentStripe < lastStripe) {
+      if (currentRowInStripe == 0) {
+        // try to find satisfied stripe
+        do {
+          currentStripeInfo = footer->stripes(static_cast<int>(currentStripe));
+          uint64_t fileLength = contents->stream->getLength();
+          if (currentStripeInfo.offset() + currentStripeInfo.indexlength() +
+            currentStripeInfo.datalength() + currentStripeInfo.footerlength() >= fileLength) {
+            std::stringstream msg;
+            msg << "Malformed StripeInformation at stripe index " << currentStripe << ": fileLength="
+                << fileLength << ", StripeInfo=(offset=" << currentStripeInfo.offset() << ", indexLength="
+                << currentStripeInfo.indexlength() << ", dataLength=" << currentStripeInfo.datalength()
+                << ", footerLength=" << currentStripeInfo.footerlength() << ")";
+            throw ParseError(msg.str());
+          }
+          currentStripeFooter = getStripeFooter(currentStripeInfo, *contents.get());
+          rowsInCurrentStripe = currentStripeInfo.numberofrows();
+
+          if (total_true_read < bitpos.size() &&
+              bitpos[total_true_read] > row_index + rowsInCurrentStripe) {
+            row_index += rowsInCurrentStripe;
+            // std::cout << "skip row group: " << r << std::endl;
+            // advance to next stripe when current stripe has no matching rows
+            currentStripe += 1;
+            currentRowInStripe = 0;
+          } else {
+            // init stripe.
+            // get writer timezone info from stripe footer to help understand timestamp values.
+            const Timezone& writerTimezone =
+              currentStripeFooter.has_writertimezone() ?
+                getTimezoneByName(currentStripeFooter.writertimezone()) :
+                localTimezone;
+            StripeStreamsImpl stripeStreams(*this, currentStripe, currentStripeInfo,
+                                            currentStripeFooter,
+                                            currentStripeInfo.offset(),
+                                            *contents->stream,
+                                            writerTimezone,
+                                            readerTimezone);
+            auto begin2 = std::chrono::steady_clock::now();
+            reader = buildReader(*contents->schema, stripeStreams);
+            time_buildReader += std::chrono::duration_cast<std::chrono::microseconds>(
+              std::chrono::steady_clock::now() - begin2).count();
+          }
+        } while (currentStripe < lastStripe);
+      }
+
+      // We now have reader ready for this stripe, skip useless row group
+      uint64_t rowsToRead =
+        std::min(static_cast<uint64_t>(data.capacity),
+                 rowsInCurrentStripe - currentRowInStripe);
+      // for (uint64_t rg = 0; rg < rowsInCurrentStripe / footer->rowindexstride(); rg++) {
+      //   if (total_true_read < bitpos.size() && bitpos[total_true_read] == row_index + rg) {
+      //     total_true_read++;
+      //   }
+      // }
+      if (enableEncodedBlock) {
+        reader->nextEncoded(data, rowsToRead, nullptr);
+      }
+      else {
+        reader->next(data, rowsToRead, nullptr);
+      }
+      // update row number
+      previousRow = firstRowOfStripe[currentStripe] + currentRowInStripe;
+      currentRowInStripe += rowsToRead;
+      row_index += rowsToRead;
+      while (total_true_read < bitpos.size() && bitpos[total_true_read] <= row_index) {
+        total_true_read++;
+      }
+      if (currentRowInStripe >= rowsInCurrentStripe) {
+        currentStripe += 1;
+        currentRowInStripe = 0;
+      }
+    }
+    data.numElements = 0;
+    markEndOfFile();
+    return false;
   }
 
   uint64_t RowReaderImpl::computeBatchSize(uint64_t requestedSize,
